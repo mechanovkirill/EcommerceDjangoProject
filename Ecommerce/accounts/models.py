@@ -1,7 +1,11 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
-# Create your models here.
 
+
+# https://docs.djangoproject.com/en/4.1/topics/auth/customizing/
+
+# Create your models here.
+# Users creating
 class MyAccountManager(BaseUserManager):
     def create_user(self, first_name, last_name, username, email, password=None):
         if not email:
@@ -9,10 +13,10 @@ class MyAccountManager(BaseUserManager):
         if not username:
             raise ValueError('User mast have username')
         user = self.model(
-            email=self.normalize_email(email), #приводит имэйн к нижнему регистру
-            username = username,
-            first_name = first_name,
-            last_name = last_name,
+            email=self.normalize_email(email),  # приводит имэйл к нижнему регистру
+            username=username,
+            first_name=first_name,
+            last_name=last_name,
         )
 
         user.set_password(password)
@@ -35,6 +39,7 @@ class MyAccountManager(BaseUserManager):
         return user
 
 
+# Account model
 class Account(AbstractBaseUser):
     first_name = models.CharField(max_length=64)
     last_name = models.CharField(max_length=64)
@@ -42,7 +47,7 @@ class Account(AbstractBaseUser):
     email = models.EmailField(max_length=128, unique=True)
     phone_number = models.CharField(max_length=64)
 
-    #required
+    # required
     date_joined = models.DateTimeField(auto_now_add=True)
     last_login = models.DateTimeField(auto_now_add=True)
     is_admin = models.BooleanField(default=False)
@@ -59,7 +64,13 @@ class Account(AbstractBaseUser):
         return self.email
 
     def has_perm(self, perm, obj=None):
-        return self.is_admin
+        return True
 
     def has_module_perms(self, add_label):
         return True
+
+    def is_staff(self):
+        return self.is_admin
+"""
+Не забыть прописать в файле настроек AUTH_USER_MODEL = 'accounts.Account' 
+"""
