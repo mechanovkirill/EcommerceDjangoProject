@@ -20,7 +20,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-
+SECRET_KEY = 'django-insecure-6+a%^^ryv_oah5z6k!zjt#k1x&e^ebzsd-f@f8(zcykjyy5a+q'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -116,6 +116,13 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR /'static'
+STATICFILES_DIRS = [
+    'Ecommerce/static',
+]
+""" В директории с settings.py создать папку статик с файлами, прописать  STATIC_ROOT = BASE_DIR /'static'
+STATICFILES_DIRS = [ 'Ecommerce/static', ] и в консоли $ python3 manage.py collectstatic """
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
