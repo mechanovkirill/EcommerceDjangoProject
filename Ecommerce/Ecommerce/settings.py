@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'category.apps.CategoryConfig',
     'accounts.apps.AccountsConfig',
+    'store.apps.StoreConfig'
 ]
 
 MIDDLEWARE = [
@@ -127,6 +128,9 @@ STATICFILES_DIRS = [
 """ В директории с settings.py создать папку статик с файлами, прописать  STATIC_ROOT = BASE_DIR /'static'
 STATICFILES_DIRS = [ 'Ecommerce/static', ] и в консоли $ python3 manage.py collectstatic """
 
+#mediafiles configuration
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR /'media'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
