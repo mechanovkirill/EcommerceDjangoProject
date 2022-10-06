@@ -1,5 +1,6 @@
 from django.db import models
 from category.models import Category
+from django.shortcuts import reverse
 
 
 # Create your models here.
@@ -14,6 +15,11 @@ class Product(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
     create_date = models.DateTimeField(auto_now_add=True)
     modified_date = models.DateTimeField(auto_now=True)
+
+    def get_url(self):
+        return reverse('store:product-detail', args=[self.category.slug, self.slug])
+    """
+    Дает url на store_view из app store"""
 
 
     def __str__(self):

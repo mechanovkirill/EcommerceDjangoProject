@@ -1,4 +1,5 @@
 from django.db import models
+from django.urls import reverse
 
 # Create your models here.
 class Category(models.Model):
@@ -9,7 +10,12 @@ class Category(models.Model):
 
     class Meta:
         verbose_name = 'category'
-        verbose_name_plural = 'categories' # Определяет имя во множественном числе в форме(admin)  (по умолчанию добавляется 's')
+        verbose_name_plural = 'categories' # Определяет имя во множественном числе в форме(admin)
+        # (по умолчанию добавляется 's')
+    def get_url(self):
+        return reverse('store:products-by-category', args=[self.slug])
+    """
+    Дает url на store_view из app store"""
 
     def __str__(self):
         return self.category_name
