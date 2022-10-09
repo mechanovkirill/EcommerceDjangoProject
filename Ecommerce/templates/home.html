@@ -27,7 +27,7 @@
 
 
 <div class="row">
-	{% for product in products %}
+    {% for product in products %}
     <div class="col-md-3">
 		<div class="card card-product-grid">
 			<a href="{{ product.get_url }}" class="img-wrap"> <img src="{{ product.images.url }}"> </a>
@@ -35,12 +35,10 @@
 				<a href="{{ product.get_url }}" class="title">{{ product.product_name }}</a>
 				<div class="price mt-1">{{ product.price }}</div> <!-- price-wrap.// -->
 			</figcaption>
-		</div>
-	</div> <!-- col.// -->
-	</div> <!-- col.// -->
+		        </div>
+	        </div> <!-- col.// -->
     {% endfor %}
-</div> <!-- row.// -->
-
+    </div> <!-- row.// -->
 </div><!-- container // -->
 </section>
 <!-- ========================= SECTION  END// ========================= -->
