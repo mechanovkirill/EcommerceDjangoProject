@@ -4,7 +4,8 @@ from category.models import Category
 from carts.views import get_cart_id
 from carts.models import CartItem
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
-from django.http import HttpResponse
+from django.db.models import Q
+
 
 # Create your views here.
 def store_view(request, category_slug=None):
@@ -33,12 +34,14 @@ def store_view(request, category_slug=None):
 
     return render(request, 'store/store.html', context=context)
 
+
 def product_detail_view(request, category_slug, product_slug):
     try:
         single_product = Product.objects.get(category__slug=category_slug, slug=product_slug)
-        in_cart = CartItem.objects.filter(cart__cart_id=get_cart_id(request), product=single_product).exists() # __ (underscore underscore) указывает на
-            # поле cart = models.ForeignKey внешний ключ который указывает на поле cart_id в таблице Cart
-            # возвращает True & False есть ли товар в корзине
+        in_cart = CartItem.objects.filter(cart__cart_id=get_cart_id(request),
+                                          product=single_product).exists()  # __ (underscore underscore) указывает на
+        # поле cart = models.ForeignKey внешний ключ который указывает на поле cart_id в таблице Cart
+        # возвращает True & False есть ли товар в корзине
 
     except Exception:
         raise Exception
@@ -50,4 +53,15 @@ def product_detail_view(request, category_slug, product_slug):
 
 
 def search_view(request):
-    return HttpResponse('search page')
+    if 'keyword' in request.GET:
+        keyword = request.GET['keyword']
+        if keyword:
+            products = Product.objects.order_by('create_date').filter(Q(description__icontains=keyword)
+                                                                      | Q(product_name__icontains=keyword))
+            products_count = products.count()
+
+    context = {
+        "products": products,
+        "products_count": products_count,
+    }
+    return render(request, 'store/store.html', context=context)
