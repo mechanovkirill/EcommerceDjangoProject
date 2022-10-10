@@ -32,8 +32,8 @@
                 <h6>Choose Color</h6>
                     <select name="color"  class="form-control" required>
                         <option value="" disabled selected>Choose Color</option>
-                        {% for i in single_product.variation_set.all %} <!--_set.all  https://stackoverflow.com/questions/25386119/whats-the-difference-between-a-onetoone-manytomany-and-a-foreignkey-field-in-d-->
-                        <option value="{{ i.variation_value }}">{{ i.variation_value }}</option>
+                        {% for i in single_product.variation_set.colors %} <!--_set.all  https://stackoverflow.com/questions/25386119/whats-the-difference-between-a-onetoone-manytomany-and-a-foreignkey-field-in-d-->
+                        <option value="{{ i.variation_value | lower }}">{{ i.variation_value | capfirst}}</option>
                         {% endfor %}
                     </select>
             </div>
@@ -41,10 +41,11 @@
         <div class="row">
             <div class="item-option-select">
                 <h6>Select Size</h6>
-                <select name="size" class="form-control">
-                        <option value="small">Small</option>
-                        <option value="medium">Medium</option>
-                        <option value="large">Large</option>
+                    <select name="size" class="form-control">
+                        <option value="" disabled selected>Select Size</option>
+                        {% for i in single_product.variation_set.sizes %} <!--_set.all  https://stackoverflow.com/questions/25386119/whats-the-difference-between-a-onetoone-manytomany-and-a-foreignkey-field-in-d-->
+                        <option value="{{ i.variation_value | lower }}">{{ i.variation_value | capfirst}}</option>
+                        {% endfor %}
                     </select>
             </div>
         </div> <!-- row.// -->
