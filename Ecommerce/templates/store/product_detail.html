@@ -30,10 +30,11 @@
         <div class="row">
             <div class="item-option-select">
                 <h6>Choose Color</h6>
-                    <select name="color" class="form-control">
-                        <option value="red">Red</option>
-                        <option value="yellow">Yellow</option>
-                        <option value="blue">Blue</option>
+                    <select name="color"  class="form-control" required>
+                        <option value="" disabled selected>Choose Color</option>
+                        {% for i in single_product.variation_set.all %} <!--_set.all  https://stackoverflow.com/questions/25386119/whats-the-difference-between-a-onetoone-manytomany-and-a-foreignkey-field-in-d-->
+                        <option value="{{ i.variation_value }}">{{ i.variation_value }}</option>
+                        {% endfor %}
                     </select>
             </div>
         </div> <!-- row.// -->
