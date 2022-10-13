@@ -76,25 +76,30 @@ def add_cart(request, product_id):
     return redirect('carts:cart-view')
 
 
-def reduce_quantity_view(request, product_id):
+def reduce_quantity_view(request, product_id, cart_item_id):
     product = get_object_or_404(Product, id=product_id)  # get the product
     cart = Cart.objects.get(cart_id=get_cart_id(request))  # получить корзину используемую в текущей сессии
-    cart_item = CartItem.objects.get(product=product, cart=cart)
-    if cart_item.quantity > 1:
-        cart_item.quantity -= 1
-        cart_item.save()
-    else:
-        cart_item.delete()
+    try:
+        cart_item = CartItem.objects.get(product=product, cart=cart, id=cart_item_id)
+        if cart_item.quantity > 1:
+            cart_item.quantity -= 1
+            cart_item.save()
+        else:
+            cart_item.delete()
+    except:
+        pass
 
     return redirect('carts:cart-view')
 
 
-def delete_cart_item_view(request, product_id):
+def delete_cart_item_view(request, product_id, cart_item_id):
     cart = Cart.objects.get(cart_id=get_cart_id(request))
     product = get_object_or_404(Product, id=product_id)
-    cart_item = CartItem.objects.get(product=product, cart=cart)
-    cart_item.delete()
-
+    try:
+        cart_item = CartItem.objects.get(product=product, cart=cart, id=cart_item_id)
+        cart_item.delete()
+    except:
+        pass
     return redirect('carts:cart-view')
 
 
