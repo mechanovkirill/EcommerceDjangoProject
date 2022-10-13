@@ -16,10 +16,28 @@ class RegistrationForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(RegistrationForm, self).__init__(*args, **kwargs)
-        self.fields['first_name'].widget.attrs["placeholder"] = "Enter your First name"
-        self.fields['last_name'].widget.attrs["placeholder"] = "Enter your Last name"
+        self.fields['first_name'].widget.attrs["placeholder"] = "Enter First Name"
+        self.fields['last_name'].widget.attrs["placeholder"] = "Enter Last Name"
         self.fields['email'].widget.attrs["placeholder"] = "Enter Email Address"
-        self.fields['phone_number'].widget.attrs["placeholder"] = "Enter Phone number"
+        self.fields['phone_number'].widget.attrs["placeholder"] = "Enter Phone Number"
         for field in self.fields:
             self.fields[field].widget.attrs["class"] = "form-control"
     """ С помощью метода супер меняет действия init и меняет атрибуты полей формы """
+
+
+    def clean(self):
+        cleaned_data = super(RegistrationForm, self).clean() # https://docs.djangoproject.com/en/4.1/ref/forms/validation/
+        password = cleaned_data.get('password')
+        confirm_password = cleaned_data.get('confirm_password')
+
+        if password != confirm_password:
+            raise forms.ValidationError(
+                'Password does not match!'
+            )
+        """The clean() method on a Field subclass is responsible for running to_python(), validate(), 
+        and run_validators() in the correct order and propagating their errors. If, at any time, any of the 
+        methods raise ValidationError, the validation stops and that error is raised. This method returns the 
+        clean data, which is then inserted into the cleaned_data dictionary of the form.
+        def clean проверяет на соответствие пароля и повторного пароля при регистрации и из-за использования 
+        метода clean() возвращает ошибки, но нужно в шаблоне прописать теги для возвращения ошибок пользователю:
+        """
