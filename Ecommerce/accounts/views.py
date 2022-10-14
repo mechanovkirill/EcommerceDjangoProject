@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from .forms import RegistrationForm
 from .models import Account
 from django.contrib import messages, auth
+from django.contrib.auth.decorators import login_required
 
 
 # Create your views here.
@@ -44,7 +45,6 @@ def login_view(request):
         print(user)
         if user is not None:
             auth.login(request, user)
-            messages.success(request, 'You are logged in!')
             return redirect('home')
 
         else:
@@ -54,4 +54,8 @@ def login_view(request):
     return render(request, 'accounts/login.html')
 
 
-
+@login_required(login_url='accounts:login-view')
+def logout_view(request):
+    auth.logout(request)
+    messages.success(request, 'You are logged out')
+    return redirect('accounts:login-view')

@@ -64,8 +64,8 @@
 					<div class="widget-header">
 						<small class="title text-muted">Welcome {{ user.first_name }}!</small>
 						<div>
-							<a href="{% url 'accounts:login-view' %}">Dashboard</a> <span class="dark-transp"> | </span>
-							<a href="{% url 'accounts:register-view' %}"> Logout </a>
+							<a href="#">Dashboard</a> <span class="dark-transp"> | </span>
+							<a href="{% url 'accounts:logout-view' %}"> Logout </a>
 						</div>
 					</div>
                     {% else %}
