@@ -3,11 +3,10 @@
 
 {% block content %}
 
-
 <!-- ========================= SECTION MAIN ========================= -->
 <section class="section-intro padding-y-sm">
 <div class="container">
-
+{% include 'includes/alerts.html' %}
 <div class="intro-banner-wrap">
 	<img src="{% static 'images/banners/1.jpg' %}" class="img-fluid rounded">
 </div>
@@ -24,7 +23,6 @@
 	<a href="{% url 'store:store-view' %}" class="btn btn-outline-primary float-right">See all</a>
 	<h3 class="section-title">Popular products</h3>
 </header><!-- sect-heading -->
-
 
 <div class="row">
     {% for product in products %}

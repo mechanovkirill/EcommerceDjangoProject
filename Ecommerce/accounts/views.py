@@ -64,6 +64,7 @@ def login_view(request):
         print(user)
         if user is not None:
             auth.login(request, user)
+            messages.success(request, f'Welcome {user.first_name} to our store! We wish you a good time')
             return redirect('home')
 
         else:
@@ -94,3 +95,7 @@ def activate_view(request, uidb64, token):
         return redirect('accounts:login-view')
     else:
         messages.error(request, 'Invalid activation link')
+
+@login_required(login_url='login')
+def dashboard_view(request):
+    return render(request, 'accounts/dashboard.html')
