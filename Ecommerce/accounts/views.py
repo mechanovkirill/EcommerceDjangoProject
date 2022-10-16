@@ -99,3 +99,4 @@ def activate_view(request, uidb64, token):
 @login_required(login_url='login')
 def dashboard_view(request):
     return render(request, 'accounts/dashboard.html')
+
