@@ -3,13 +3,15 @@
 
 {% block content %}
 
+<section class="section-content padding-y bg">
+<div class="container">
 <!-- ============================ COMPONENT 1 ================================= -->
 {% if not cart_items %}
     <h2 class="text-center">Your shopping cart is empty</h2>
     <div class="text-center">
     <a href="{% url 'store:store-view' %}" class="btn btn-primary">Continue shopping</a>
     </Div>
-{% endif %}
+{% else %}
 
 
 <div class="row">
@@ -98,7 +100,7 @@
 			<p class="text-center mb-3">
 				<img src="./images/misc/payments.png" height="26">
 			</p>
-			<a href="./place-order.html" class="btn btn-primary btn-block"> Checkout </a>
+			<a href="{% url 'carts:checkout-view' %}" class="btn btn-primary btn-block"> Checkout </a>
 			<a href="./store.html" class="btn btn-light btn-block">Continue Shopping</a>
 		</div> <!-- card-body.// -->
 		</div> <!-- card.// -->
@@ -107,6 +109,7 @@
 
 
 </div> <!-- row.// -->
+{% endif %}
 <!-- ============================ COMPONENT 1 END .// ================================= -->
 
 </div> <!-- container .//  -->
