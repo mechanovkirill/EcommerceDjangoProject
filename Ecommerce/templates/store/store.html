@@ -150,7 +150,7 @@
                     {% if in_cart == True %}
 				        <a href="#" class="btn btn-block btn-success"> <span class="text">Added to cart</span> <i class="fas fa-check"></i> </a>
                     {% else %}
-                        <a href="{% url 'carts:add-cart' product.id %}" class="btn btn-block btn-primary">Add to cart </a>
+                        <a href="{% url 'store:product-detail' product.category.slug product.slug %}" class="btn btn-block btn-primary">Check details </a>
                     {% endif %}
                 {% endif %}
 			</figcaption>
