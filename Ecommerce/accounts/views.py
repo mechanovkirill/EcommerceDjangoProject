@@ -12,8 +12,9 @@ from django.utils.encoding import force_bytes
 from django.core.mail import EmailMessage
 from django.contrib.auth.tokens import default_token_generator
 
-# Create your views here.
-
+import requests
+from carts.models import Cart, CartItem
+from carts.views import get_cart_id
 
 def register_view(request):
     if request.method == 'POST':
@@ -58,14 +59,57 @@ def login_view(request):
     if request.method == 'POST':
         email = request.POST['email']
         password = request.POST['password']
-        print(email, password)
 
         user = auth.authenticate(email=email, password=password) # https://docs.djangoproject.com/en/4.1/topics/auth/default/#django.contrib.auth.authenticate
-        print(user)
         if user is not None:
+            try:
+                cart = Cart.objects.get(cart_id=get_cart_id(request))
+                is_cart_item_exists = CartItem.objects.filter(cart=cart).exists()
+                if is_cart_item_exists:
+                    cart_item = CartItem.objects.filter(cart=cart)
+
+                    # getting the product variations by cart id
+                    product_variation = []
+                    for item in cart_item:
+                        variation = item.variations.all()
+                        product_variation.append(list(variation))
+
+                    # get the cart items from the user to access his product variations
+                    cart_item = CartItem.objects.filter(user=user)
+                    id_list = []
+                    existing_variation_list = []
+                    for item in cart_item:
+                        existing_variation = item.variations.all()
+                        existing_variation_list.append(list(existing_variation))
+                        id_list.append(item.id)
+
+                    for pr in product_variation:
+                        if pr in existing_variation_list:
+                            index = existing_variation_list.index(pr)
+                            item_id = id[index]
+                            item = CartItem.objects.get(id=item_id)
+                            item.quantity += 1
+                            item.user = user
+                            item.save()
+                        else:
+                            cart_item = CartItem.objects.filter(cart=cart)
+                            for item in cart_item:
+                                item.user = user
+                                item.save()
+
+            except:
+                pass
             auth.login(request, user)
             messages.success(request, f'Welcome {user.first_name} to our store! We wish you a good time')
-            return redirect('home')
+            url = request.META.get('HTTP_REFERER')
+            try:
+                query = requests.utils.urlparse(url).query
+                params = dict(x.split('=') for x in query.split('&'))
+                if 'next' in params:
+                    nextPage = params['next']
+                return redirect(nextPage)
+            except:
+                pass
 
         else:
             messages.error(request, 'invalid login or password')
