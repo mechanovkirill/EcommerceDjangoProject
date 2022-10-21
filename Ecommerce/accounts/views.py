@@ -101,7 +101,7 @@ def login_view(request):
                 pass
             auth.login(request, user)
             messages.success(request, f'Welcome {user.first_name} to our store! We wish you a good time')
-            url = request.META.get('HTTP_REFERER')
+            url = request.META.get('HTTP_REFERER') # https://docs.djangoproject.com/en/4.1/ref/request-response/
             try:
                 query = requests.utils.urlparse(url).query
                 params = dict(x.split('=') for x in query.split('&'))
