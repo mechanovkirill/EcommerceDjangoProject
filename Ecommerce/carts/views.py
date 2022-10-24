@@ -50,8 +50,11 @@ def add_cart(request, product_id):
                 index = existing_variation_list.index(product_variation)  # list method index
                 item_id = id_list[index]
                 item = CartItem.objects.get(product=product, id=item_id)
-                item.quantity += 1
-                item.save()
+                if item.quantity < product.stock:
+                    item.quantity += 1
+                    item.save()
+                else:
+                    pass
             else:
                 # create a new cart item
                 item = CartItem.objects.create(product=product, user=current_user, quantity=1)
@@ -111,8 +114,11 @@ def add_cart(request, product_id):
                 index = existing_variation_list.index(product_variation) # list method index
                 item_id = id_list[index]
                 item = CartItem.objects.get(product=product, id=item_id)
-                item.quantity += 1
-                item.save()
+                if item.quantity < product.stock:
+                    item.quantity += 1
+                    item.save()
+                else:
+                    pass
             else:
                 # create a new cart item
                 item = CartItem.objects.create(product=product, cart=cart, quantity=1)

@@ -10,7 +10,7 @@ class Product(models.Model):
     description = models.TextField(max_length=512, blank=True)
     price = models.IntegerField()
     images = models.ImageField(upload_to='photos/products')  # добавлять несколько изображений
-    stock = models.IntegerField()  # Автоматизация
+    stock = models.IntegerField()
     is_available = models.BooleanField(default=True)  # Автоматизация
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
     create_date = models.DateTimeField(auto_now_add=True)
