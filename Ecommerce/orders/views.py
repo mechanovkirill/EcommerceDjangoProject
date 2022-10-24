@@ -6,6 +6,11 @@ from .models import Order, Payment, OrderProduct
 import datetime
 from decimal import Decimal
 from django.contrib import messages
+# email
+from django.template.loader import render_to_string
+from django.utils.http import urlsafe_base64_encode
+from django.utils.encoding import force_bytes
+from django.core.mail import EmailMessage
 
 
 # Create your views here.
@@ -113,19 +118,28 @@ def payments_view(request):
 
             # reduce the quantity of sold products
                 product = Product.objects.get(id=item.product_id)
-                if product.stock > 0:
-                    product.stock -= item.quantity
-                    product.save()
-                    # clear cart
-                    CartItem.objects.filter(user=request.user).delete()
-                else:
+                try:
+                    if product.stock > 0:
+                        product.stock -= item.quantity
+                        product.save()
+                except:
                     messages.error(
                         request, 'We\'re sorry, but there are fewer items in stock than you\'d like to purchase.'
                     )
-                    pass
+                    return redirect('orders:payments-view')
 
+            # clear cart
+            CartItem.objects.filter(user=request.user).delete()
 
             # Send order received email to customer
+            mail_subject = 'Thank you for your order!'
+            message = render_to_string('orders/order_received_email.html', {
+                'user': request.user,
+                'order': order,
+            })
+            to_email = request.user.email
+            send_email = EmailMessage(mail_subject, message, to=[to_email])
+            send_email.send()
 
             # send order number and transaction id back to js
             return redirect('orders:payments-view')
