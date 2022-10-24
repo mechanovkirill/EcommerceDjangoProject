@@ -26,7 +26,7 @@
 <div class="card">
     <h5 class="card-header">Payment method</h5>
   <div class="card-body">
-    <p class="card-text">{{ order.payment.payment_method }}</p>
+    <p class="card-text"> PayPal </p>
   </div>
 </div>
 <div class="card">
@@ -95,9 +95,16 @@
 			</dl>
 			<hr>
 			<p class="text-center mb-3">
-				<img src="./images/misc/payments.png" height="26">
+				<img src="{% static './images/misc/payments.png' %}" height="26">
 			</p>
-			<a href="{% url 'carts:checkout-view' %}" class="btn btn-primary btn-block"> Make payment </a>
+
+            <form action="{% url 'orders:payments-view' %}" method="POST">
+            {% csrf_token %}
+                <input name="amount_paid" type="hidden" value="{{ total_plus_tax }}">
+                <input name="payment_id" type="hidden" value="{{ order.order_number }}">
+                  <button type="submit" name="submit" class="btn btn-primary btn-block">Make payment</button>
+            </form>
+
 		</div> <!-- card-body.// -->
 		</div> <!-- card.// -->
 
