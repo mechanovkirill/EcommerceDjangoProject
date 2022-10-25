@@ -8,9 +8,9 @@ from decimal import Decimal
 from django.contrib import messages
 # email
 from django.template.loader import render_to_string
-from django.utils.http import urlsafe_base64_encode
-from django.utils.encoding import force_bytes
 from django.core.mail import EmailMessage
+# Json
+from django.http import JsonResponse
 
 
 # Create your views here.
@@ -84,7 +84,6 @@ def payments_view(request):
             payment_db_data = Payment()
             payment_db_data.user = request.user
             payment_db_data.payment_id = order.order_number + datetime.datetime.now().strftime('%H%M')
-            print(type(order.order_number))
             payment_db_data.amount_paid = order.order_total
             payment_db_data.payment_method = 'PayPal'
             payment_db_data.status = 'COMPLETED'
@@ -101,31 +100,38 @@ def payments_view(request):
             cart_items = CartItem.objects.filter(user=request.user)
 
             for item in cart_items:
-                order_product = OrderProduct()
-                order_product.order_id = order.id
-                order_product.payment = payment
-                order_product.user_id = request.user.id
-                order_product.product_id = item.product_id
-                order_product.quantity = item.quantity
-                order_product.product_price = item.product.price
-                order_product.ordered = True
-                order_product.save()
-
-                cart_item = CartItem.objects.get(id=item.id)
-                product_variation = cart_item.variations.all()
-                order_product = OrderProduct.objects.get(id=order_product.id)
-                order_product.variations.set(product_variation) #   https://docs.djangoproject.com/en/4.1/ref/models/relations/
-
-            # reduce the quantity of sold products
                 product = Product.objects.get(id=item.product_id)
                 try:
-                    if product.stock > 0:
+                    if product.stock >= item.quantity:
+                        order_product = OrderProduct()
+                        order_product.order_id = order.id
+                        order_product.payment = payment
+                        order_product.user_id = request.user.id
+                        order_product.product_id = item.product_id
+                        order_product.quantity = item.quantity
+                        order_product.product_price = item.product.price
+                        order_product.ordered = True
+                        order_product.save()
+
+                        cart_item = CartItem.objects.get(id=item.id)
+                        product_variation = cart_item.variations.all()
+                        order_product = OrderProduct.objects.get(id=order_product.id)
+                        order_product.variations.set(product_variation) #   https://docs.djangoproject.com/en/4.1/ref/models/relations/
+
+                    # reduce the quantity of sold products
                         product.stock -= item.quantity
                         product.save()
                 except:
+                    ordered_order = Order.objects.get(
+                        user=request.user,
+                        is_ordered=True,
+                        order_number=request.POST.get('payment_id')
+                    )
+                    ordered_order.is_ordered = False
                     messages.error(
                         request, 'We\'re sorry, but there are fewer items in stock than you\'d like to purchase.'
                     )
+
                     return redirect('orders:payments-view')
 
             # clear cart
@@ -141,11 +147,41 @@ def payments_view(request):
             send_email = EmailMessage(mail_subject, message, to=[to_email])
             send_email.send()
 
-            # send order number and transaction id back to js
-            return redirect('orders:payments-view')
+            # send order number and transaction id back to js if connected to PayPal
+            # data = {
+            #     'order_number': order.order_number,
+            #     'transID': payment.payment_id,
+            # }
+            # return JsonResponse(data)
+        # **************************************************************************************************
+            # Sending when paypal is not available, otherwise this code should be in order_complete_view
+            order_number = request.POST.get('order_number')
+            try:
+                order = Order.objects.get(order_number=order_number, is_ordered=True)
+                ordered_products = OrderProduct.objects.filter(order_id=order.id)
+                payment = order.payment
+                subtotal = order.order_total - order.tax
+
+                context = {
+                    'order': order,
+                    'ordered_products': ordered_products,
+                    'payment': payment,
+                    'subtotal': subtotal,
+                }
+                return render(request, 'orders/order_complete.html', context=context)
+
+            except (Payment.DoesNotExist, Order.DoesNotExist):
+                messages.error(request, 'Order or payment data is not available')
+                return render(request, 'orders/order_complete.html')
+
         except:
             pass
     else:
         return render(request, 'orders/payments.html')
 
     return render(request, 'orders/payments.html')
+
+
+def order_complete_view(request):
+    return render(request, 'orders/order_complete.html')
+

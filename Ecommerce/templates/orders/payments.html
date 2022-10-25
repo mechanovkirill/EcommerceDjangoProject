@@ -103,6 +103,7 @@
             {% csrf_token %}
                 <input name="amount_paid" type="hidden" value="{{ total_plus_tax }}">
                 <input name="payment_id" type="hidden" value="{{ order.order_number }}">
+                <input name="order_number" type="hidden" value="{{ order.order_number }}">
                   <button type="submit" name="submit" class="btn btn-primary btn-block">Make payment</button>
             </form>
 
