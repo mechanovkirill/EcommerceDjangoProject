@@ -109,7 +109,7 @@ def login_view(request):
                     nextPage = params['next']
                 return redirect(nextPage)
             except:
-                pass
+                return redirect('home')
 
         else:
             messages.error(request, 'invalid login or password')

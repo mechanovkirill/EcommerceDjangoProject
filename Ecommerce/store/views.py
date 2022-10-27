@@ -7,6 +7,7 @@ from carts.models import CartItem
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.db.models import Q
 from django.contrib import messages
+from orders.models import OrderProduct
 
 # Create your views here.
 def store_view(request, category_slug=None):
@@ -37,18 +38,30 @@ def store_view(request, category_slug=None):
 
 
 def product_detail_view(request, category_slug, product_slug):
+    user = request.user
     try:
         single_product = Product.objects.get(category__slug=category_slug, slug=product_slug)
-        in_cart = CartItem.objects.filter(cart__cart_id=get_cart_id(request),
-                                          product=single_product).exists()  # __ (underscore underscore) указывает на
+        in_cart = CartItem.objects.filter(cart__cart_id=get_cart_id(request), product=single_product).exists()
+        # __ (underscore underscore) указывает на
         # поле cart = models.ForeignKey внешний ключ который указывает на поле cart_id в таблице Cart
         # возвращает True or False есть ли товар в корзине
 
     except Exception:
         raise Exception
+    # for review
+    if user.is_authenticated:
+        orderproduct = OrderProduct.objects.filter(user=user, product_id=single_product.id).exists()
+    else:
+        orderproduct = None
+
+    # get the review
+    reviews = ReviewRating.objects.filter(product_id=single_product.id, status=True)
+
     context = {
         'single_product': single_product,
         'in_cart': in_cart,
+        'orderproduct': orderproduct,
+        'reviews': reviews,
     }
     return render(request, 'store/product_detail.html', context=context)
 
@@ -72,7 +85,7 @@ def submit_review(request, product_id):
     url = request.META.get('HTTP_REFERER')
     if request.method == 'POST':
         try:
-            reviews = ReviewRating.objects.get(user__id=request.user.id, product__id=product_id)
+            reviews = ReviewRating.objects.get(user_id=request.user.id, product_id=product_id)
             # __ in user__id & product__id потому что ссылается на ForeignKey
             form = ReviewRatingForm(request.POST, instance=reviews)
             form.save()
