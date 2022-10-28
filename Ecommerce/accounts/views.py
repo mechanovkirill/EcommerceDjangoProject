@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
-from .forms import RegistrationForm
-from .models import Account
+from .forms import RegistrationForm, UserForm, UserProfileForm
+from .models import Account, UserProfile
 from django.contrib import messages, auth
 from django.contrib.auth.decorators import login_required
 
@@ -16,7 +16,7 @@ import requests
 from carts.models import Cart, CartItem
 from carts.views import get_cart_id
 from orders.models import Order
-
+from django.shortcuts import get_object_or_404
 def register_view(request):
     if request.method == 'POST':
         form = RegistrationForm(request.POST)
@@ -223,4 +223,23 @@ def my_orders_view(request):
 
 
 def edit_profile_view(request):
-    return render(request, 'accounts/edit_profile.html')
+    """instance предоставляет экземпляр модели для обновления, иначе будет сохранен новый экземпляр.
+    Checks for the existence of model instances, and if so, and user posting changes, updates them """
+    userprofile = get_object_or_404(UserProfile, user=request.user)
+    if request.method == 'POST':
+        user_form = UserForm(request.POST, instance=request.user) # update instead of save a new instance
+        profile_form = UserProfileForm(request.POST, request.FILES, instance=userprofile)
+        if user_form.is_valid() and profile_form.is_valid():
+            user_form.save()
+            profile_form.save()
+            messages.success(request, 'Your profile has been updated successful')
+            return redirect('accounts:edit-profile-view')
+    else:
+        user_form = UserForm(instance=request.user)
+        profile_form = UserProfileForm(instance=userprofile)
+    context = {
+        'user_form': user_form,
+        'profile_form': profile_form,
+        'userprofile': userprofile,
+    }
+    return render(request, 'accounts/edit_profile.html', context=context)

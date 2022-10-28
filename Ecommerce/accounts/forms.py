@@ -1,5 +1,5 @@
 from django import forms
-from .models import Account
+from .models import Account, UserProfile
 
 class RegistrationForm(forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput(attrs={
@@ -42,3 +42,29 @@ class RegistrationForm(forms.ModelForm):
         def clean проверяет на соответствие пароля и повторного пароля при регистрации и из-за использования 
         метода clean() возвращает ошибки, но нужно в шаблоне прописать теги для возвращения ошибок пользователю:
         """
+
+
+class UserForm(forms.ModelForm):
+    class Meta:
+        model = Account
+        fields = ('first_name', 'last_name', 'phone_number')
+
+    def __init__(self, *args, **kwargs):
+        """ С помощью метода супер меняет действия init и меняет атрибуты полей формы """
+        super(UserForm, self).__init__(*args, **kwargs)
+        for field in self.fields:
+            self.fields[field].widget.attrs["class"] = "form-control"
+
+class UserProfileForm(forms.ModelForm):
+    profile_picture = forms.ImageField(
+        required=False, error_messages= {'invalid': ("Image files only")}, widget=forms.FileInput
+    ) # убирает надпись с наименованием файла модели над формой
+    class Meta:
+        model = UserProfile
+        fields = ('address', 'city', 'state', 'country', 'profile_picture')
+
+    def __init__(self, *args, **kwargs):
+        """ С помощью метода супер меняет действия init и меняет атрибуты полей формы """
+        super(UserProfileForm, self).__init__(*args, **kwargs)
+        for field in self.fields:
+            self.fields[field].widget.attrs["class"] = "form-control"
