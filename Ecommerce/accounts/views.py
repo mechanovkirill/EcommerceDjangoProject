@@ -15,6 +15,7 @@ from django.contrib.auth.tokens import default_token_generator
 import requests
 from carts.models import Cart, CartItem
 from carts.views import get_cart_id
+from orders.models import Order
 
 def register_view(request):
     if request.method == 'POST':
@@ -142,7 +143,14 @@ def activate_view(request, uidb64, token):
 
 @login_required(login_url='login')
 def dashboard_view(request):
-    return render(request, 'accounts/dashboard.html')
+    orders = Order.objects.filter(user_id=request.user.id, is_ordered=True)
+    orders_count = orders.count()
+
+    context = {
+        'orders': orders,
+        'orders_count': orders_count
+    }
+    return render(request, 'accounts/dashboard.html', context=context)
 
 def forgot_password_view(request):
     if request.method == 'POST':
@@ -204,3 +212,15 @@ def reset_password_view(request):
             return redirect('accounts:reset-password-view')
     else:
         return render(request, 'accounts/resetPassword.html')
+
+
+def my_orders_view(request):
+    orders = Order.objects.filter(user_id=request.user.id, is_ordered=True).order_by('-created_at') # - in -created_at will give drscending result
+    context = {
+        'orders': orders,
+    }
+    return render(request, 'accounts/my_orders.html', context=context)
+
+
+def edit_profile_view(request):
+    return render(request, 'accounts/edit_profile.html')
