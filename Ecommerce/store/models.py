@@ -94,4 +94,4 @@ class ProductGallery(models.Model):
 
     class Meta:
         verbose_name = 'productgallery'
-        verbose_name_plural = 'Фотографии продукта'
+        verbose_name_plural = 'product gallery'
