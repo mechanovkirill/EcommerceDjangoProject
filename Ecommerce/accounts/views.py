@@ -15,7 +15,7 @@ from django.contrib.auth.tokens import default_token_generator
 import requests
 from carts.models import Cart, CartItem
 from carts.views import get_cart_id
-from orders.models import Order
+from orders.models import Order, OrderProduct
 from django.shortcuts import get_object_or_404
 def register_view(request):
     if request.method == 'POST':
@@ -33,6 +33,15 @@ def register_view(request):
             )
             user.phone_number = phone_number
             user.save()
+            userprofile = UserProfile(
+                user=user,
+                address=None,
+                profile_picture='/home/host_user/PycharmProjects/EcommersDjangoProject/Ecommerce/Ecommerce/static/images/avatars/avatar2.jpg',
+                city=None,
+                state=None,
+                country=None
+            )
+            userprofile.save()
 
             # USER ACTIVATION
             current_site = get_current_site(request)
@@ -141,14 +150,16 @@ def activate_view(request, uidb64, token):
     else:
         messages.error(request, 'Invalid activation link')
 
-@login_required(login_url='login')
+@login_required(login_url='accounts:login-view')
 def dashboard_view(request):
     orders = Order.objects.filter(user_id=request.user.id, is_ordered=True)
     orders_count = orders.count()
+    userprofile = UserProfile.objects.get(user__id=request.user.id)
 
     context = {
         'orders': orders,
-        'orders_count': orders_count
+        'orders_count': orders_count,
+        'userprofile': userprofile,
     }
     return render(request, 'accounts/dashboard.html', context=context)
 
@@ -213,7 +224,7 @@ def reset_password_view(request):
     else:
         return render(request, 'accounts/resetPassword.html')
 
-
+@login_required(login_url='accounts:login-view')
 def my_orders_view(request):
     orders = Order.objects.filter(user_id=request.user.id, is_ordered=True).order_by('-created_at') # - in -created_at will give drscending result
     context = {
@@ -221,7 +232,7 @@ def my_orders_view(request):
     }
     return render(request, 'accounts/my_orders.html', context=context)
 
-
+@login_required(login_url='accounts:login-view')
 def edit_profile_view(request):
     """instance предоставляет экземпляр модели для обновления, иначе будет сохранен новый экземпляр.
     Checks for the existence of model instances, and if so, and user posting changes, updates them """
@@ -243,3 +254,44 @@ def edit_profile_view(request):
         'userprofile': userprofile,
     }
     return render(request, 'accounts/edit_profile.html', context=context)
+
+@login_required(login_url='accounts:login-view')
+def change_password_view(request):
+    userprofile = get_object_or_404(UserProfile, user=request.user)
+    if request.method == 'POST':
+        current_password = request.POST['current_password']
+        new_password = request.POST['new_password']
+        confirm_password = request.POST['confirm_password']
+
+        user = Account.objects.get(username__exact=request.user.username)
+        if new_password == confirm_password:
+            success = user.check_password(current_password)
+            if success:
+                user.set_password(new_password)
+                user.save()
+                messages.success(request, 'Password updated successfuly.')
+                return redirect('accounts:change-password-view')
+            else:
+                messages.error(request, 'Current password is not correct.')
+                return redirect('accounts:change-password-view')
+        else:
+            messages.error(request, 'New password confirmation error.')
+            return redirect('accounts:change-password-view')
+    context = {
+        'userprofile': userprofile,
+    }
+    return render(request, 'accounts/change_password.html', context=context)
+
+
+
+@login_required(login_url='accounts:login-view')
+def order_detail_view(request, order_id):
+    order_detail = OrderProduct.objects.filter(order__order_number=order_id)
+    order = Order.objects.get(order_number=order_id)
+    subtotal = order.order_total - order.tax
+    context = {
+        'order_detail': order_detail,
+        'order': order,
+        'subtotal': subtotal,
+    }
+    return render(request, 'accounts/order_detail.html', context=context)

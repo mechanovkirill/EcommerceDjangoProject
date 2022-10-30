@@ -80,11 +80,11 @@ class Account(AbstractBaseUser):
 
 class UserProfile(models.Model):
     user = models.OneToOneField(Account, on_delete=models.CASCADE)
-    address = models.CharField(max_length=256, blank=True)
-    profile_picture = models.ImageField(blank=True, upload_to='userprofile')
-    city = models.CharField(blank=True, max_length=24)
-    state = models.CharField(blank=True, max_length=24)
-    country = models.CharField(blank=True, max_length=24)
+    address = models.CharField(max_length=256, blank=True, null=True)
+    profile_picture = models.ImageField(blank=True, null=True, upload_to='userprofile')
+    city = models.CharField(blank=True, null=True, max_length=24)
+    state = models.CharField(blank=True, null=True, max_length=24)
+    country = models.CharField(blank=True, null=True, max_length=24)
 
     def __str__(self):
         return self.user.first_name
