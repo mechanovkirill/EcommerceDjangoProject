@@ -23,11 +23,14 @@ def store_view(request, category_slug=None):
         paged_products = paginator.get_page(page)
         products_count = products.count()
     else:
-        products = Product.objects.all().filter(is_available=True).order_by('id')
+        products = Product.objects.all().filter(is_available=True).order_by('create_date')
         paginator = Paginator(products, 8)
         page = request.GET.get('page')
         paged_products = paginator.get_page(page)
         products_count = products.count()
+
+    for product in products:
+        reviews = ReviewRating.objects.filter(product_id=product.id, status=True)
 
     context = {
         'products': paged_products,

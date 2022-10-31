@@ -1,5 +1,5 @@
 from django.views.generic import TemplateView
-from store.models import Product
+from store.models import Product, ReviewRating
 from django.shortcuts import render
 from django.core.paginator import Paginator
 
@@ -10,8 +10,13 @@ def home_view(request):
     page = request.GET.get('page')
     paged_products = paginator.get_page(page)
 
+    # get the review
+    for product in products:
+        reviews = ReviewRating.objects.filter(product_id=product.id, status=True)
+
     context = {
         'products': paged_products,
+        'reviews': reviews,
     }
 
 
