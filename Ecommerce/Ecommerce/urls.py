@@ -19,8 +19,9 @@ from .views import home_view
 from django.conf.urls.static import static
 from django.conf import settings
 
+
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path('adminlogin/', admin.site.urls),
     path('', home_view, name='home'),
     path('store/', include('store.urls')),
     path('cart/', include('carts.urls')),

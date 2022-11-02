@@ -8,6 +8,10 @@ from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.db.models import Q
 from django.contrib import messages
 from orders.models import OrderProduct
+from accounts.models import UserProfile
+import logging
+
+logger = logging.getLogger(__name__)
 
 # Create your views here.
 def store_view(request, category_slug=None):
@@ -59,8 +63,10 @@ def product_detail_view(request, category_slug, product_slug):
 
     # get the review
     reviews = ReviewRating.objects.filter(product_id=single_product.id, status=True)
+    # get user avatar
+    user_profile = UserProfile.objects.get(user=user)
 
-    #get the product gallery
+    # get the product gallery
     product_gallery = ProductGallery.objects.filter(product_id=single_product.id)
 
     context = {
@@ -69,6 +75,7 @@ def product_detail_view(request, category_slug, product_slug):
         'orderproduct': orderproduct,
         'reviews': reviews,
         'product_gallery': product_gallery,
+        'user_profile': user_profile,
     }
     return render(request, 'store/product_detail.html', context=context)
 
@@ -78,7 +85,8 @@ def search_view(request):
         keyword = request.GET['keyword']
         if keyword:
             products = Product.objects.order_by('create_date').filter(Q(description__icontains=keyword)
-                                                                      | Q(product_name__icontains=keyword))
+                                                                      | Q(product_name__icontains=keyword)
+                                                                      )
             products_count = products.count()
 
     context = {

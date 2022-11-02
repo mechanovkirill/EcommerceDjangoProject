@@ -133,7 +133,7 @@
 {% for review in reviews %}
 	<article class="box mb-3">
 		<div class="icontext w-100">
-			<img src="./images/avatars/avatar1.jpg" class="img-xs icon rounded-circle">
+			<img src="{{ user_profile.profile_picture.url }}" class="img-xs icon rounded-circle">
 			<div class="text">
 				<span class="date text-muted float-md-right">{{ review.updated_at }}</span>
                 <div>
