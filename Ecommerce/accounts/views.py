@@ -17,6 +17,11 @@ from carts.models import Cart, CartItem
 from carts.views import get_cart_id
 from orders.models import Order, OrderProduct
 from django.shortcuts import get_object_or_404
+import logging, traceback
+
+logger = logging.getLogger(__name__)
+
+
 def register_view(request):
     if request.method == 'POST':
         form = RegistrationForm(request.POST)
@@ -107,8 +112,8 @@ def login_view(request):
                                 item.user = user
                                 item.save()
 
-            except:
-                pass
+            except Exception:
+                logger.exception('user logging error'), traceback
             auth.login(request, user)
             messages.success(request, f'Welcome {user.first_name} to our store! We wish you a good time')
             url = request.META.get('HTTP_REFERER') # https://docs.djangoproject.com/en/4.1/ref/request-response/
@@ -141,6 +146,7 @@ def activate_view(request, uidb64, token):
         user = Account._default_manager.get(pk=uid)
     except(TypeError, ValueError, OverflowError, Account.DoesNotExist):
         user = None
+        logger.exception('user activation error'), traceback
 
     if user is not None and default_token_generator.check_token(user, token):
         user.is_active = True
@@ -196,6 +202,7 @@ def password_validate_view(request, uidb64, token):
         user = Account._default_manager.get(pk=uid)
     except(TypeError, ValueError, OverflowError, Account.DoesNotExist):
         user = None
+        logger.exception('password validate error'), traceback
 
     if user is not None and default_token_generator.check_token(user, token):
         request.session['uid'] = uid

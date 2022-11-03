@@ -9,8 +9,10 @@ from django.contrib import messages
 # email
 from django.template.loader import render_to_string
 from django.core.mail import EmailMessage
-# Json
-from django.http import JsonResponse
+
+import logging, traceback
+
+logger = logging.getLogger(__name__)
 
 
 # Create your views here.
@@ -147,13 +149,6 @@ def payments_view(request):
             send_email = EmailMessage(mail_subject, message, to=[to_email])
             send_email.send()
 
-            # send order number and transaction id back to js if connected to PayPal
-            # data = {
-            #     'order_number': order.order_number,
-            #     'transID': payment.payment_id,
-            # }
-            # return JsonResponse(data)
-        # **************************************************************************************************
             # Sending when paypal is not available, otherwise this code should be in order_complete_view
             order_number = request.POST.get('order_number')
             try:
@@ -173,6 +168,7 @@ def payments_view(request):
             except (Payment.DoesNotExist, Order.DoesNotExist):
                 messages.error(request, 'Order or payment data is not available')
                 return render(request, 'orders/order_complete.html')
+                logger.exception('Payment error'), traceback
 
         except:
             pass

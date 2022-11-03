@@ -9,7 +9,7 @@ from django.db.models import Q
 from django.contrib import messages
 from orders.models import OrderProduct
 from accounts.models import UserProfile
-import logging
+import logging, traceback
 
 logger = logging.getLogger(__name__)
 
@@ -54,7 +54,9 @@ def product_detail_view(request, category_slug, product_slug):
         # возвращает True or False есть ли товар в корзине
 
     except Exception:
+        logger.exception('category or product search error'), traceback
         raise Exception
+
     # for review
     if user.is_authenticated:
         orderproduct = OrderProduct.objects.filter(user=user, product_id=single_product.id).exists()
@@ -64,7 +66,10 @@ def product_detail_view(request, category_slug, product_slug):
     # get the review
     reviews = ReviewRating.objects.filter(product_id=single_product.id, status=True)
     # get user avatar
-    user_profile = UserProfile.objects.get(user=user)
+    if user.is_authenticated:
+        user_profile = UserProfile.objects.get(user=user)
+    else:
+        user_profile = None
 
     # get the product gallery
     product_gallery = ProductGallery.objects.filter(product_id=single_product.id)

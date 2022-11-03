@@ -162,8 +162,10 @@ LOGGING = {
     },
     'handlers': {
         'file': {
-            'class': 'logging.FileHandler',
+            'class': 'logging.handlers.RotatingFileHandler',
             'filename': 'logs/''general.log',
+            'maxBytes': 10000000,  # 1024 * 1024 * 15B = 15MB
+            'backupCount': 20,
             'level': 'WARNING',
             'formatter': 'verbose',
         }

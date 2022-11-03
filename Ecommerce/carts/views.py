@@ -3,6 +3,9 @@ from store.models import Product, Variation
 from .models import Cart, CartItem
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.decorators import login_required
+import logging, traceback
+
+logger = logging.getLogger(__name__)
 
 
 # Create your views here.
@@ -31,7 +34,6 @@ def add_cart(request, product_id):
                     product_variation.append(variation)
                 except:
                     pass
-
         is_cart_item_exist = CartItem.objects.filter(product=product, user=current_user).exists()
         if is_cart_item_exist:
             cart_item = CartItem.objects.filter(product=product, user=current_user)
@@ -153,8 +155,8 @@ def reduce_quantity_view(request, product_id, cart_item_id):
             cart_item.save()
         else:
             cart_item.delete()
-    except:
-        pass
+    except Exception:
+        logger.exception('reduce_quantity_view error'), traceback
 
     return redirect('carts:cart-view')
 
