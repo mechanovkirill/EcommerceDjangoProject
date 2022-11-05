@@ -3,13 +3,14 @@ from category.models import Category
 from django.shortcuts import reverse
 from accounts.models import Account
 from django.db.models import Avg, Count
+from django.core.validators import MaxLengthValidator
 
 
 # Create your models here.
 class Product(models.Model):
     product_name = models.CharField(max_length=256, unique=True)
     slug = models.SlugField(max_length=256, unique=True, allow_unicode=True)
-    description = models.TextField(max_length=512, blank=True)
+    description = models.TextField(max_length=512, blank=True, validators=[MaxLengthValidator(512, message='Maximum value exceeded')])
     price = models.IntegerField()
     images = models.ImageField(upload_to='photos/products')
     stock = models.IntegerField()
@@ -76,7 +77,7 @@ class Variation(models.Model):
 class ReviewRating(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     user = models.ForeignKey(Account, on_delete=models.CASCADE)
-    subject = models.CharField(max_length=128, blank=True)
+    subject = models.CharField(max_length=128, blank=True,)
     review = models.TextField(max_length=512, blank=True)
     rating = models.FloatField()
     ip = models.CharField(max_length=24, blank=True)

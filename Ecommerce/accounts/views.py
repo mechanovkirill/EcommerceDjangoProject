@@ -113,7 +113,7 @@ def login_view(request):
                                 item.save()
 
             except Exception:
-                logger.exception('user logging error'), traceback
+                pass
             auth.login(request, user)
             messages.success(request, f'Welcome {user.first_name} to our store! We wish you a good time')
             url = request.META.get('HTTP_REFERER') # https://docs.djangoproject.com/en/4.1/ref/request-response/
