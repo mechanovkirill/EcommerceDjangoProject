@@ -122,6 +122,7 @@ def payments_view(request):
 
                     # reduce the quantity of sold products
                         product.stock -= item.quantity
+                        product.popularity += 1
                         product.save()
                 except:
                     ordered_order = Order.objects.get(

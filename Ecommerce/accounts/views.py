@@ -41,7 +41,7 @@ def register_view(request):
             userprofile = UserProfile(
                 user=user,
                 address=None,
-                profile_picture='/home/host_user/PycharmProjects/EcommersDjangoProject/Ecommerce/Ecommerce/static/images/avatars/avatar2.jpg',
+                profile_picture='/home/certo/projects/EcommersDjangoProject/Ecommerce/Ecommerce/static/images/avatars/avatar.png',
                 city=None,
                 state=None,
                 country=None
