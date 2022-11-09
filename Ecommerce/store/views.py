@@ -22,13 +22,13 @@ def store_view(request, category_slug=None):
     if category_slug != None:
         categorys = get_object_or_404(Category, slug=category_slug)
         products = Product.objects.filter(category=categorys, is_available=True).order_by('-popularity')
-        paginator = Paginator(products, 8)
+        paginator = Paginator(products, 9)
         page = request.GET.get('page')
         paged_products = paginator.get_page(page)
         products_count = products.count()
     else:
         products = Product.objects.all().filter(is_available=True).order_by('-popularity')
-        paginator = Paginator(products, 8)
+        paginator = Paginator(products, 9)
         page = request.GET.get('page')
         paged_products = paginator.get_page(page)
         products_count = products.count()
