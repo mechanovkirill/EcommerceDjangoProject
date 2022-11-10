@@ -103,28 +103,27 @@ def payments_view(request):
 
             for item in cart_items:
                 product = Product.objects.get(id=item.product_id)
-                try:
-                    if product.stock >= item.quantity:
-                        order_product = OrderProduct()
-                        order_product.order_id = order.id
-                        order_product.payment = payment
-                        order_product.user_id = request.user.id
-                        order_product.product_id = item.product_id
-                        order_product.quantity = item.quantity
-                        order_product.product_price = item.product.price
-                        order_product.ordered = True
-                        order_product.save()
+                if product.stock >= item.quantity:
+                    order_product = OrderProduct()
+                    order_product.order_id = order.id
+                    order_product.payment = payment
+                    order_product.user_id = request.user.id
+                    order_product.product_id = item.product_id
+                    order_product.quantity = item.quantity
+                    order_product.product_price = item.product.price
+                    order_product.ordered = True
+                    order_product.save()
 
-                        cart_item = CartItem.objects.get(id=item.id)
-                        product_variation = cart_item.variations.all()
-                        order_product = OrderProduct.objects.get(id=order_product.id)
-                        order_product.variations.set(product_variation) #   https://docs.djangoproject.com/en/4.1/ref/models/relations/
+                    cart_item = CartItem.objects.get(id=item.id)
+                    product_variation = cart_item.variations.all()
+                    order_product = OrderProduct.objects.get(id=order_product.id)
+                    order_product.variations.set(product_variation) #   https://docs.djangoproject.com/en/4.1/ref/models/relations/
 
-                    # reduce the quantity of sold products
-                        product.stock -= item.quantity
-                        product.popularity += 1
-                        product.save()
-                except:
+                # reduce the quantity of sold products
+                    product.stock -= item.quantity
+                    product.popularity += 1
+                    product.save()
+                else:
                     ordered_order = Order.objects.get(
                         user=request.user,
                         is_ordered=True,
@@ -141,35 +140,75 @@ def payments_view(request):
             CartItem.objects.filter(user=request.user).delete()
 
             # Send order received email to customer
-            mail_subject = 'Thank you for your order!'
-            message = render_to_string('orders/order_received_email.html', {
-                'user': request.user,
-                'order': order,
-            })
-            to_email = request.user.email
-            send_email = EmailMessage(mail_subject, message, to=[to_email])
-            send_email.send()
-
-            # Sending when paypal is not available, otherwise this code should be in order_complete_view
-            order_number = request.POST.get('order_number')
-            try:
-                order = Order.objects.get(order_number=order_number, is_ordered=True)
-                ordered_products = OrderProduct.objects.filter(order_id=order.id)
-                payment = order.payment
-                subtotal = order.order_total - order.tax
-
-                context = {
+            ordered_products = OrderProduct.objects.filter(
+                user=request.user,
+                order__order_number=order.order_number
+            )
+            products_names = []
+            for p in ordered_products:
+                p_name = p.product.product_name
+                products_names.append(p_name)
+            if 'Developer' in products_names:
+                mail_subject = 'Спасибо что посетили мой сайт!'
+                message = render_to_string('orders/order_developer_email.html', {
+                    'user': request.user,
                     'order': order,
-                    'ordered_products': ordered_products,
-                    'payment': payment,
-                    'subtotal': subtotal,
-                }
-                return render(request, 'orders/order_complete.html', context=context)
+                })
+                to_email = request.user.email
+                send_email = EmailMessage(mail_subject, message, to=[to_email])
+                send_email.send()
 
-            except (Payment.DoesNotExist, Order.DoesNotExist):
-                messages.error(request, 'Order or payment data is not available')
-                return render(request, 'orders/order_complete.html')
-                logger.exception('Payment error'), traceback
+                # Sending when paypal is not available, otherwise this code should be in order_complete_view
+                order_number = request.POST.get('order_number')
+                try:
+                    order = Order.objects.get(order_number=order_number, is_ordered=True)
+                    ordered_products = OrderProduct.objects.filter(order_id=order.id)
+                    payment = order.payment
+                    subtotal = order.order_total - order.tax
+
+                    context = {
+                        'order': order,
+                        'ordered_products': ordered_products,
+                        'payment': payment,
+                        'subtotal': subtotal,
+                    }
+                    return render(request, 'orders/order_complete.html', context=context)
+
+                except (Payment.DoesNotExist, Order.DoesNotExist):
+                    messages.error(request, 'Order or payment data is not available')
+                    return render(request, 'orders/order_complete.html')
+                    logger.exception('Payment error'), traceback
+
+            else:
+                mail_subject = 'Thank you for your order!'
+                message = render_to_string('orders/order_received_email.html', {
+                    'user': request.user,
+                    'order': order,
+                })
+                to_email = request.user.email
+                send_email = EmailMessage(mail_subject, message, to=[to_email])
+                send_email.send()
+
+                # Sending when paypal is not available, otherwise this code should be in order_complete_view
+                order_number = request.POST.get('order_number')
+                try:
+                    order = Order.objects.get(order_number=order_number, is_ordered=True)
+                    ordered_products = OrderProduct.objects.filter(order_id=order.id)
+                    payment = order.payment
+                    subtotal = order.order_total - order.tax
+
+                    context = {
+                        'order': order,
+                        'ordered_products': ordered_products,
+                        'payment': payment,
+                        'subtotal': subtotal,
+                    }
+                    return render(request, 'orders/order_complete.html', context=context)
+
+                except (Payment.DoesNotExist, Order.DoesNotExist):
+                    messages.error(request, 'Order or payment data is not available')
+                    return render(request, 'orders/order_complete.html')
+                    logger.exception('Payment error'), traceback
 
         except:
             pass
