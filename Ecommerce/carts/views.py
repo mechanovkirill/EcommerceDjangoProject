@@ -17,6 +17,7 @@ def get_cart_id(request):
 
 
 def add_cart(request, product_id):
+    url = request.META.get('HTTP_REFERER')
     current_user = request.user
     product = Product.objects.get(id=product_id)  # get the product
     # if user authenticated
@@ -75,7 +76,7 @@ def add_cart(request, product_id):
                 cart_item.variations.add(*product_variation)
             cart_item.save()
 
-        return redirect('carts:cart-view')
+        return redirect(url)
     # if user is not authenticated
     else:
         product_variation = []
@@ -139,7 +140,7 @@ def add_cart(request, product_id):
                 cart_item.variations.add(*product_variation)
             cart_item.save()
 
-        return redirect('carts:cart-view')
+        return redirect(url)
 
 
 def reduce_quantity_view(request, product_id, cart_item_id):

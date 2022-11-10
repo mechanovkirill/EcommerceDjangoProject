@@ -48,7 +48,7 @@ def product_detail_view(request, category_slug, product_slug):
     user = request.user
     try:
         single_product = Product.objects.get(category__slug=category_slug, slug=product_slug)
-        in_cart = CartItem.objects.filter(cart__cart_id=get_cart_id(request), product=single_product).exists()
+        in_cart = CartItem.objects.filter(product=single_product, user=user).exists()
         # __ (underscore underscore) указывает на
         # поле cart = models.ForeignKey внешний ключ который указывает на поле cart_id в таблице Cart
         # возвращает True or False есть ли товар в корзине
@@ -81,6 +81,7 @@ def product_detail_view(request, category_slug, product_slug):
         'product_gallery': product_gallery,
         'user_profile': user_profile,
     }
+
     return render(request, 'store/product_detail.html', context=context)
 
 

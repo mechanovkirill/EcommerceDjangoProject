@@ -70,8 +70,13 @@
         {% if single_product.stock <= 0 %}
             <h5 class="text-danger">Out of stock</h5>
             {% else %}
+            {% if in_cart %}
                 <button class="btn  btn-primary"> <span class="text">Add to cart</span> <i class="fas fa-shopping-cart"></i>  </button>
-
+                <a href="{% url 'store:store-view' %}" class="btn  btn-primary"> <span class="text">Continue shopping</span></a>
+                 <a href="{% url 'carts:cart-view' %}" class="btn  btn-primary"> <span class="text">Cart</span></a>
+                {% else %}
+                <button class="btn  btn-primary"> <span class="text">Add to cart</span> <i class="fas fa-shopping-cart"></i>  </button>
+            {% endif %}
         {% endif %}
     </article> <!-- product-info-aside .// -->
 </form>
