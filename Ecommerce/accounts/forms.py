@@ -40,7 +40,7 @@ class RegistrationForm(forms.ModelForm):
         methods raise ValidationError, the validation stops and that error is raised. This method returns the 
         clean data, which is then inserted into the cleaned_data dictionary of the form.
         def clean проверяет на соответствие пароля и повторного пароля при регистрации и из-за использования 
-        метода clean() возвращает ошибки, но нужно в шаблоне прописать теги для возвращения ошибок пользователю:
+        метода clean() возвращает ошибки, но нужно не забыть в шаблоне прописать теги для возвращения ошибок пользователю:
         """
 
 
