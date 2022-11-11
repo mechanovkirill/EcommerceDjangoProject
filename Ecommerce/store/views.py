@@ -48,7 +48,10 @@ def product_detail_view(request, category_slug, product_slug):
     user = request.user
     try:
         single_product = Product.objects.get(category__slug=category_slug, slug=product_slug)
-        in_cart = CartItem.objects.filter(product=single_product, user=user).exists()
+        if user.is_authenticated:
+            in_cart = CartItem.objects.filter(product=single_product, user=user).exists()
+        else:
+            in_cart = None
         # __ (underscore underscore) указывает на
         # поле cart = models.ForeignKey внешний ключ который указывает на поле cart_id в таблице Cart
         # возвращает True or False есть ли товар в корзине
