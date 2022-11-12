@@ -14,7 +14,7 @@
 {% else %}
 
 
-<div class="row">
+<div class="row"> <!-- row -->
 	<aside class="col-lg-9">
 <div class="card">
 <table class="table table-borderless table-shopping-cart">
@@ -71,7 +71,7 @@
 		</div> <!-- price-wrap .// -->
 	</td>
 	<td class="text-right">
-	<a href="{% url 'carts:delete-cart-item-view' cart_item.product.id cart_item.id %}" onclick="return confirm("Are you sure you want to delete this item?")" class="btn btn-danger"> Remove</a>
+	<a href="{% url 'carts:delete-cart-item-view' cart_item.product.id cart_item.id %}" onclick="return confirm("Are you sure you want to delete this item?")" class="btn btn-danger d-none d-sm-block"> Remove</a>
 	</td>
 </tr>
 {% endfor %}

@@ -2,7 +2,7 @@
 
 <header class="section-header mt-4 mb-3">
 
-<nav class="navbar navbar-expand-xl navbar-light bg-white border-bottom border-top">
+<nav class="navbar navbar-expand-md navbar-light bg-white border-bottom border-top">
     <div class="container mx-auto py-2">
         <a href="{% url 'home' %}" class="brand-wrap">
 			<img class="logo" src="{% static './images/logo.png' %}">
@@ -15,7 +15,7 @@
     <ul class="navbar-nav mr-auto ">
       <li class="nav-item active">
 
-        <div class="d-none d-md-block col-lg col-sm col-md col-6 flex-grow-0">
+        <div class="d-none d-lg-block col-lg">
 		<div class="category-wrap dropdown d-inline-block float-right">
 			<button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
 				<i class="fa fa-bars"></i> All category
@@ -30,12 +30,15 @@
 
       </li>
       <li class="nav-item">
-        <a href="{% url 'store:store-view' %}" class="d-none d-md-block btn btn-outline-primary">Store</a>
+          <div class="col-sm-12 col mt-2 my-md-0">
+              <a href="{% url 'store:store-view' %}" class="btn btn-outline-primary d-block">Store</a>
+          </div>
+
       </li>
 
      <li class="nav-item">
 
-        <div class="col-lg  col-md-6 col-sm-12 col">
+        <div class="col-lg col-lg-auto col-sm-12 col mt-2 my-md-0">
 		<form action="{% url 'store:search-view' %}" class="search" method="GET">
 			<div class="input-group w-100">
 			    <input type="text" class="form-control" style="width:60%;" placeholder="Search" name="keyword">
@@ -53,8 +56,8 @@
 
     </ul>
 
-  <div class="col-lg-3 col-sm-6 col-8 order-2 order-lg-3">
-				<div class="d-flex justify-content-end my-3 my-md-0">
+  <div class="col-lg-4 col-sm-12 col-md-6 col order-2 order-lg-3">
+				<div class="d-flex justify-content-center justify-content-md-end mt-3 my-md-0">
                 {% if user.id is not None %}
 					<div class="widget-header">
 						<small class="title text-muted">Welcome {{ user.first_name }}!</small>
